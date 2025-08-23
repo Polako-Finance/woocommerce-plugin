@@ -1,0 +1,9 @@
+/build
+/languages
+
+/.idea
+/tmp
+/wp-content
+
+/node_modules
+/vendor

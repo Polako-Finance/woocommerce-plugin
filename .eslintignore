@@ -1,0 +1,15 @@
+/build
+/languages
+
+/.idea
+/tmp
+/wp-content
+
+/node_modules
+/vendor
+
+/assets
+/includes
+/tests
+
+!.eslintrc.js

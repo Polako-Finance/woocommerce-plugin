@@ -1,0 +1,38 @@
+{
+	"name": "polako-finance/polako-gateway-for-woocommerce",
+	"version": "0.1.0",
+	"description": "Accept payments in Serbia with ease",
+	"type": "wordpress-plugin",
+	"license": "GPL-3.0",
+	"archive": {
+		"exclude": [
+			"!/assets",
+			"!/build",
+			"!/languages",
+			"/.idea",
+			"/client",
+			"/node_modules",
+			"/tmp",
+			"/vendor",
+			"/wp-content",
+			"/plugin-svn",
+			"*.xml.dist",
+			"*.zip",
+			".eslint*",
+			".gitignore",
+			".nvmrc",
+			".prettier*",
+			"docker-compose.yml",
+			"GETTING_STARTED.md"
+		]
+	},
+	"require-dev": {
+		"woocommerce/woocommerce-sniffs": "1.0.0",
+		"sirbrillig/phpcs-changed": "^2.11.1"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	}
+}

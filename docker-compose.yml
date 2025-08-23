@@ -1,0 +1,36 @@
+services:
+    wordpress:
+        image: wordpress:6.3-php8.2-apache
+        ports:
+            - '8080:80'
+        environment:
+            WORDPRESS_DB_HOST: db
+            WORDPRESS_DB_NAME: wpdb
+            WORDPRESS_DB_USER: wpuser
+            WORDPRESS_DB_PASSWORD: wppass
+        volumes:
+            - ./wp-content:/var/www/html/wp-content
+            - ./assets:/var/www/html/wp-content/plugins/polako-gateway-for-woocommerce/assets
+            - ./build:/var/www/html/wp-content/plugins/polako-gateway-for-woocommerce/build
+            - ./includes:/var/www/html/wp-content/plugins/polako-gateway-for-woocommerce/includes
+            - ./languages:/var/www/html/wp-content/plugins/polako-gateway-for-woocommerce/languages
+            - ./src:/var/www/html/wp-content/plugins/polako-gateway-for-woocommerce/src
+            - ./polako-gateway-for-woocommerce.php:/var/www/html/wp-content/plugins/polako-gateway-for-woocommerce/polako-gateway-for-woocommerce.php
+        depends_on:
+            - db
+
+    db:
+        image: mysql:8.0
+        ports:
+            - '3306:3306'
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            MYSQL_ROOT_PASSWORD: rootpass
+            MYSQL_DATABASE: wpdb
+            MYSQL_USER: wpuser
+            MYSQL_PASSWORD: wppass
+        volumes:
+            - db_data:/var/lib/mysql
+
+volumes:
+    db_data:

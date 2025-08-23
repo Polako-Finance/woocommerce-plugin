@@ -1,0 +1,49 @@
+{
+	"name": "polako-gateway-for-woocommerce",
+	"title": "Polako Gateway for WooCommerce",
+	"version": "0.1.0",
+	"license": "GPL-3.0",
+	"engines": {
+		"node": ">=20",
+		"npm": ">=10"
+	},
+	"devDependencies": {
+		"@prettier/plugin-php": "^0.24.0",
+		"@woocommerce/dependency-extraction-webpack-plugin": "^3.0.1",
+		"@woocommerce/eslint-plugin": "^2.3.0",
+		"@wordpress/env": "^10.26.0",
+		"@wordpress/scripts": "^30.19.0",
+		"node-wp-i18n": "^1.2.8",
+		"prettier": "^3.6.2"
+	},
+	"overrides": {
+		"@babel/runtime": "^7.26.10",
+		"@wordpress/scripts": {
+			"http-proxy-middleware@<2.0.8": "^2.0.8",
+			"ws@<7.5.9": "^7.5.9",
+			"webpack-dev-server@<5.2.0": "^5.2.0"
+		}
+	},
+	"scripts": {
+		"build": "npm run makepot && npm run build:webpack",
+		"build:webpack": "wp-scripts build",
+		"start:webpack": "wp-scripts start",
+		"lint": "wp-scripts format && wp-scripts lint-js && prettier . --write",
+		"postbuild": "npm run -s && npm run archive",
+		"archive": "composer archive --file=$npm_package_name --format=zip",
+		"postarchive": "rm -rf $npm_package_name && unzip $npm_package_name.zip -d $npm_package_name && rm $npm_package_name.zip && zip -r $npm_package_name.zip $npm_package_name && rm -rf $npm_package_name",
+        "svn": "rm -rf plugin-svn/tmp && rm -rf plugin-svn/trunk && unzip $npm_package_name.zip -d plugin-svn/tmp && mkdir plugin-svn/trunk && mkdir plugin-svn/tags/$npm_package_version",
+        "postsvn": "mv plugin-svn/tmp/$npm_package_name/* plugin-svn/trunk && cp -r plugin-svn/trunk/* plugin-svn/tags/$npm_package_version && rm -rf plugin-svn/tmp",
+		"makepot": "wpi18n makepot --domain-path languages --pot-file $npm_package_name.pot --type plugin --main-file $npm_package_name.php --exclude node_modules,tests,docs,wp-content,plugin-svn",
+		"phpcs": "./vendor/bin/phpcs *.php includes -p",
+		"env": "wp-env",
+		"env:start": "wp-env start",
+		"env:start-local": "npm run env:install-plugins && npm run env:start",
+		"env:clean": "wp-env clean",
+		"env:stop": "wp-env stop",
+		"env:destroy": "wp-env destroy",
+		"env:install-plugins": "bash ./tests/e2e/bin/install-plugins.sh",
+		"postenv:start": "bash ./tests/e2e/bin/initialize.sh",
+		"phpcompat": "./vendor/bin/phpcs --standard=phpcs-compat.xml.dist -p ."
+	}
+}

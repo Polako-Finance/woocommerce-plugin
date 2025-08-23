@@ -1,0 +1,11 @@
+/build
+/languages
+*.zip
+
+/tmp
+/wp-content
+
+/node_modules
+/vendor
+
+/plugin-svn
