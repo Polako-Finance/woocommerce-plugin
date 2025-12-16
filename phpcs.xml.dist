@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <ruleset name="WordPress Coding Standards">
 	<rule ref="WooCommerce-Core">
+        <exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+        <exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
 	</rule>
 
 	<!-- Files to check -->
@@ -36,4 +38,6 @@
 		<!-- It wants @since to contain defined version and does not allow just x.x.x -->
 		<exclude name="WooCommerce.Commenting.CommentHooks.MissingSinceVersionComment"/>
 	</rule>
+
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
 </ruleset>

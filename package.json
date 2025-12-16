@@ -1,7 +1,7 @@
 {
 	"name": "polako-gateway-for-woocommerce",
 	"title": "Polako Gateway for WooCommerce",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"license": "GPL-3.0",
 	"engines": {
 		"node": ">=20",
@@ -32,8 +32,8 @@
 		"postbuild": "npm run -s && npm run archive",
 		"archive": "composer archive --file=$npm_package_name --format=zip",
 		"postarchive": "rm -rf $npm_package_name && unzip $npm_package_name.zip -d $npm_package_name && rm $npm_package_name.zip && zip -r $npm_package_name.zip $npm_package_name && rm -rf $npm_package_name",
-        "svn": "rm -rf plugin-svn/tmp && rm -rf plugin-svn/trunk && unzip $npm_package_name.zip -d plugin-svn/tmp && mkdir plugin-svn/trunk && mkdir plugin-svn/tags/$npm_package_version",
-        "postsvn": "mv plugin-svn/tmp/$npm_package_name/* plugin-svn/trunk && cp -r plugin-svn/trunk/* plugin-svn/tags/$npm_package_version && rm -rf plugin-svn/tmp",
+		"svn": "rm -rf plugin-svn/tmp && rm -rf plugin-svn/trunk && unzip $npm_package_name.zip -d plugin-svn/tmp && mkdir plugin-svn/trunk && mkdir plugin-svn/tags/$npm_package_version",
+		"postsvn": "mv plugin-svn/tmp/$npm_package_name/* plugin-svn/trunk && cp -r plugin-svn/trunk/* plugin-svn/tags/$npm_package_version && rm -rf plugin-svn/tmp",
 		"makepot": "wpi18n makepot --domain-path languages --pot-file $npm_package_name.pot --type plugin --main-file $npm_package_name.php --exclude node_modules,tests,docs,wp-content,plugin-svn",
 		"phpcs": "./vendor/bin/phpcs *.php includes -p",
 		"env": "wp-env",

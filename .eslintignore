@@ -8,6 +8,8 @@
 /node_modules
 /vendor
 
+/plugin-svn
+
 /assets
 /includes
 /tests

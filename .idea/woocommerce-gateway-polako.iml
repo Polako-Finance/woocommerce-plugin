@@ -19,6 +19,9 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/squizlabs/php_codesniffer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/woocommerce/woocommerce-sniffs" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/wp-coding-standards/wpcs" />
+      <excludeFolder url="file://$MODULE_DIR$/wp-content/plugins/plugin-check" />
+      <excludeFolder url="file://$MODULE_DIR$/wp-content/plugins/plugin-check/vendor/nikic/php-parser" />
+      <excludeFolder url="file://$MODULE_DIR$/wp-content/plugins/woocommerce/vendor" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -7,19 +7,11 @@
   <component name="PhpCodeSniffer">
     <phpcs_settings>
       <PhpCSConfiguration beautifier_path="$PROJECT_DIR$/vendor/bin/phpcbf" tool_path="$PROJECT_DIR$/vendor/bin/phpcs" />
+      <PhpCSConfiguration asDefaultInterpreter="true" beautifier_path="$PROJECT_DIR$/vendor/bin/phpcbf" tool_path="$PROJECT_DIR$/vendor/bin/phpcs" />
     </phpcs_settings>
   </component>
   <component name="PhpIncludePathManager">
     <include_path>
-      <path value="$PROJECT_DIR$/wp-content/plugins/plugin-check/vendor/squizlabs/php_codesniffer" />
-      <path value="$PROJECT_DIR$/wp-content/plugins/plugin-check/vendor/sirbrillig/phpcs-variable-analysis" />
-      <path value="$PROJECT_DIR$/wp-content/plugins/plugin-check/vendor/automattic/vipwpcs" />
-      <path value="$PROJECT_DIR$/wp-content/plugins/plugin-check/vendor/plugin-check/phpcs-sniffs" />
-      <path value="$PROJECT_DIR$/wp-content/plugins/plugin-check/vendor/dealerdirect/phpcodesniffer-composer-installer" />
-      <path value="$PROJECT_DIR$/wp-content/plugins/plugin-check/vendor/composer" />
-      <path value="$PROJECT_DIR$/wp-content/plugins/plugin-check/vendor/phpcsstandards/phpcsutils" />
-      <path value="$PROJECT_DIR$/wp-content/plugins/plugin-check/vendor/phpcsstandards/phpcsextra" />
-      <path value="$PROJECT_DIR$/wp-content/plugins/plugin-check/vendor/wp-coding-standards/wpcs" />
       <path value="$PROJECT_DIR$/vendor/phpcompatibility/phpcompatibility-paragonie" />
       <path value="$PROJECT_DIR$/vendor/phpcompatibility/phpcompatibility-wp" />
       <path value="$PROJECT_DIR$/vendor/phpcsstandards/phpcsutils" />
@@ -33,7 +25,7 @@
       <path value="$PROJECT_DIR$/vendor/wp-coding-standards/wpcs" />
     </include_path>
   </component>
-  <component name="PhpProjectSharedConfiguration" php_language_level="8.0">
+  <component name="PhpProjectSharedConfiguration" php_language_level="7.4">
     <option name="suggestChangeDefaultLanguageLevel" value="false" />
   </component>
   <component name="PhpUnit">
