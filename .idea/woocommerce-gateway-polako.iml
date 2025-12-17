@@ -22,6 +22,7 @@
       <excludeFolder url="file://$MODULE_DIR$/wp-content/plugins/plugin-check" />
       <excludeFolder url="file://$MODULE_DIR$/wp-content/plugins/plugin-check/vendor/nikic/php-parser" />
       <excludeFolder url="file://$MODULE_DIR$/wp-content/plugins/woocommerce/vendor" />
+      <excludeFolder url="file://$MODULE_DIR$/plugin-svn" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

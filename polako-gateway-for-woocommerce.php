@@ -5,7 +5,7 @@
  * Author: Polako Finance
  * Author URI: https://polako-finance.com
  * License: GPL-3.0
- * Version: 0.1.1
+ * Version: 0.1.2
  * Requires Plugins: woocommerce
  * Requires at least: 6.7
  * Tested up to: 6.8
@@ -19,7 +19,7 @@
 
 defined('ABSPATH') || exit();
 
-define('WC_GATEWAY_POLAKO_VERSION', '0.1.1');
+define('WC_GATEWAY_POLAKO_VERSION', '0.1.2');
 define('WC_GATEWAY_POLAKO_URL', untrailingslashit(plugins_url('/', __FILE__)));
 define('WC_GATEWAY_POLAKO_PATH', untrailingslashit(plugin_dir_path(__FILE__)));
 

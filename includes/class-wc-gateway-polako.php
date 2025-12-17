@@ -31,13 +31,13 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 		$this->method_title = __('Polako Finance', 'polako-gateway-for-woocommerce');
 		$this->method_description = sprintf(__('Safe and secure payments in Serbia with Polako Finance.', 'polako-gateway-for-woocommerce'));
 		$this->icon = WC_GATEWAY_POLAKO_URL . '/assets/images/icon.png';
-		// Declare supported functionality
+		// Declare supported functionality.
 		$this->supports = ['products'];
 
 		$this->init_form_fields();
 		$this->init_settings();
 
-		// Set up merchant data
+		// Set up merchant data.
 		$this->platform_id = $this->get_option('platform_id');
 		$this->api_key = $this->get_option('api_key');
 		$this->url = 'https://backend.polako-finance.com/api/session/signed';
@@ -45,7 +45,7 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 		$this->description = $this->get_option('description');
 		$this->enabled = 'yes' === $this->get_option('enabled') ? 'yes' : 'no';
 
-		// Change the Gateway URL when in Test Mode
+		// Change the Gateway URL when in Test Mode.
 		if ('yes' === $this->get_option('testmode')) {
 			$this->url = 'https://stage.infra.polako-finance.com/payment-gateway/api/session/signed';
 			$this->add_testmode_admin_settings_notice();
@@ -148,38 +148,36 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 	/**
 	 * Initialize the payment session and return the result
 	 *
-	 * @param int $order_id
+	 * @param int $order_id Order ID.
 	 * @return string[] Init result {
 	 *     @type string $result   Result of the operation
 	 *     @type string $redirect Redirect URL
 	 * }
-	 *
-	 * @throws Exception
 	 */
 	public function process_payment($order_id)
 	{
 		$order = wc_get_order($order_id);
 
 		if (!$order) {
-			$this->log('Invalid order ID: ' . $order_id);
+			$this->d_log('Invalid order ID: ' . $order_id);
 			return ['result' => 'fail'];
 		}
 
-		// organize items
+		// organize items.
 		$items = [];
 		$dump_items = [];
 		foreach ($order->get_items() as $item) {
 			$product = $item->get_product();
-			$item_total = self::get_precise_amount($item->get_total());
-			$tax_amount = self::get_precise_amount($item->get_total_tax());
 			$items[] = [
 				'code' => $product ? $product->get_sku() : null,
 				'name' => $item->get_name(),
-				'price' => self::format_amount(($item_total + $tax_amount) / $item->get_quantity() / 100),
+				'price' => $order->get_item_total($item, true, true),
 				'quantity' => $item->get_quantity(),
+				'tax_schema' => self::get_item_tax_schema($item),
 			];
 
 			$dump_items[] = [
+				'type' => $item->get_type(),
 				'sku' => $product ? $product->get_sku() : null,
 				'name' => $item->get_name(),
 				'quantity' => $item->get_quantity(),
@@ -188,10 +186,36 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 				'total' => $item->get_total(),
 				'total_tax' => $item->get_total_tax(),
 				'product' => $product,
+				'item_tot' => $order->get_item_total($item, true, true),
+				'line_tot' => $order->get_line_total($item, true, true),
+				'item_tax' => $order->get_item_tax($item, true),
+				'tax_status' => $item->get_tax_status(),
+			];
+		}
+		foreach ($order->get_shipping_methods() as $method) {
+			$items[] = [
+				'code' => $method->get_method_id(),
+				'name' => $method->get_name(),
+				'price' => $order->get_item_total($method, true, true),
+				'quantity' => $method->get_quantity(),
+				'tax_schema' => self::get_item_tax_schema($method),
+			];
+
+			$dump_items[] = [
+				'type' => $method->get_type(),
+				'id' => $method->get_method_id(),
+				'name' => $method->get_name(),
+				'quantity' => $method->get_quantity(),
+				'total' => $method->get_total(),
+				'total_tax' => $method->get_total_tax(),
+				'item_tot' => $order->get_item_total($method, true, true),
+				'line_tot' => $order->get_line_total($method, true, true),
+				'item_tax' => $order->get_item_tax($method, true),
+				'tax_status' => $method->get_tax_status(),
 			];
 		}
 
-		// prepare the payload
+		// prepare the payload.
 		$payload = [
 			'currency' => $order->get_currency(),
 			'language' => strtolower(strtok(get_locale(), '_-')),
@@ -213,21 +237,22 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 			'platform_id' => $this->platform_id,
 		];
 
-		// sign the payload with
+		// sign the payload with.
 		$data_string = $payload['order_id'] . '|' . $payload['total'] . '|' . $order->get_currency();
 		$payload['signature'] = hash_hmac('sha256', $data_string, $this->api_key);
 
-		// prepare debug data; logged only in test mode
+		// prepare debug data; logged only in test mode.
 		$dump = [
 			'payload' => $payload,
 			'order_data' => $order->get_data(),
 			'sign_data' => $data_string,
 			'price_decimals' => wc_get_price_decimals(),
-			'line_items' => $dump_items,
+			'order_items' => $dump_items,
 		];
-		$this->log('ORDER_DUMP:' . PHP_EOL . wp_json_encode($dump, JSON_PRETTY_PRINT) . PHP_EOL);
+		unset($dump['order_data']['meta_data']);
+		$this->d_log('ORDER_DUMP:' . PHP_EOL . wp_json_encode($dump, JSON_PRETTY_PRINT) . PHP_EOL);
 
-		// initialize the payment session
+		// initialize the payment session.
 		$response = wp_remote_post($this->url, [
 			'method' => 'POST',
 			'headers' => ['Content-Type' => 'application/json'],
@@ -236,23 +261,23 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 		]);
 
 		if (is_wp_error($response)) {
-			$this->log('Payment init failed: ' . $response->get_error_message());
+			$this->i_log('Payment init failed: ' . $response->get_error_message());
 			return ['result' => 'fail'];
 		}
 
-		// process the response
+		// process the response.
 		$code = wp_remote_retrieve_response_code($response);
 		$body = wp_remote_retrieve_body($response);
 		$decoded = json_decode($body, true);
 
-		$this->log('Payment init response: HTTP ' . $code . PHP_EOL . $this->url . PHP_EOL . $body);
+		$this->d_log('Payment init response: HTTP ' . $code . PHP_EOL . $this->url . PHP_EOL . $body);
 
 		if (200 > $code || 299 < $code || !isset($decoded['paymentPageUrl'])) {
-			$this->log('Unexpected API response or missing redirect URL.');
+			$this->i_log('Unexpected API response or missing redirect URL: HTTP ' . $code . PHP_EOL . $body);
 			return ['result' => 'fail'];
 		}
 
-		// redirect the customer to the payment form
+		// redirect the customer to the payment form.
 		return [
 			'result' => 'success',
 			'redirect' => $decoded['paymentPageUrl'],
@@ -264,12 +289,12 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 	{
 		if (
 			isset($_SERVER['REQUEST_METHOD']) &&
-			$_SERVER['REQUEST_METHOD'] === 'POST' &&
+			'POST' === $_SERVER['REQUEST_METHOD'] &&
 			isset($_SERVER['CONTENT_TYPE']) &&
 			'application/json' === sanitize_text_field(wp_unslash($_SERVER['CONTENT_TYPE']))
 		) {
 			$data = json_decode(file_get_contents('php://input'), true);
-			if ($data === null) {
+			if (null === $data) {
 				http_response_code(400);
 				exit('Invalid JSON structure');
 			}
@@ -282,7 +307,7 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 			exit('Invalid JSON structure');
 		}
 
-		/** Sanitize and format the callback body */
+		// Sanitize and format the callback body.
 		$sanitized_data = [
 			'order_id' => isset($data['order_id']) ? absint($data['order_id']) : 0,
 			'total' => isset($data['total']) ? sanitize_text_field($data['total']) : '',
@@ -293,7 +318,7 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 
 		$this->process_callback($sanitized_data);
 
-		// Let the originator know the callback has been processed
+		// Let the originator know the callback has been processed.
 		header('HTTP/1.0 200 OK');
 		flush();
 	}
@@ -303,25 +328,25 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 	{
 		$order = wc_get_order($data['order_id']);
 		if (!$order) {
-			$this->log('Invalid order ID: ' . $data['order_id']);
+			$this->d_log('Invalid order ID: ' . $data['order_id']);
 			exit();
 		}
 
 		if (!in_array($order->get_status(), self::ACCEPT_STATUSES)) {
-			$this->log('Order has already been processed');
+			$this->d_log('Order has already been processed');
 			return;
 		}
 
-		// verify the signature
+		// verify the signature.
 		$data_string = $data['order_id'] . '|' . $data['total'] . '|' . $data['success'];
 		$calculated_signature = hash_hmac('sha256', $data_string, $this->api_key);
 
 		if (!hash_equals($calculated_signature, $data['signature'])) {
-			$this->log('Mismatching signature');
+			$this->i_log('Mismatching signature');
 			exit();
 		}
 
-		// update the order status
+		// update the order status.
 		if (1 == $data['success']) {
 			$order->payment_complete($data['tx_id']);
 			do_action('woocommerce_polako_handle_itn_payment_complete', $data, $order);
@@ -330,13 +355,20 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 		}
 	}
 
-	public function log($message)
+	/** Log an informational message */
+	public function i_log($message)
+	{
+		if (empty($this->logger)) {
+			$this->logger = new WC_Logger();
+		}
+		$this->logger->add('polako', $message);
+	}
+
+	/** Log a debug message */
+	public function d_log($message)
 	{
 		if ('yes' === $this->get_option('testmode')) {
-			if (empty($this->logger)) {
-				$this->logger = new WC_Logger();
-			}
-			$this->logger->add('polako', $message);
+			$this->i_log($message);
 		}
 	}
 
@@ -390,13 +422,26 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 		}
 	}
 
-	private static function get_precise_amount($amount)
+	private static function get_item_tax_schema($item)
 	{
-		return absint(wc_format_decimal((float) $amount * 100, wc_get_price_decimals()));
-	}
+		$taxes = $item->get_taxes();
+		$tax_rate_ids = !empty($taxes['total']) ? $taxes['total'] : $taxes['subtotal'] ?? [];
 
-	private static function format_amount($amount)
-	{
-		return wc_format_decimal($amount, wc_get_price_decimals());
+		if (empty($tax_rate_ids)) {
+			return null; // non-taxable, exempt, or tax-free.
+		}
+
+		$tax_value = WC_Tax::get_rate_percent_value(array_key_first($tax_rate_ids));
+
+		switch ($tax_value) {
+			case 20:
+				return 'VAT';
+			case 10:
+				return 'Reduced_VAT';
+			case 0:
+				return 'No_VAT';
+			default:
+				return null;
+		}
 	}
 }
