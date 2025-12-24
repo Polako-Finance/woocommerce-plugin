@@ -219,7 +219,7 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 		$payload = [
 			'currency' => $order->get_currency(),
 			'language' => strtolower(strtok(get_locale(), '_-')),
-			'order_id' => $order->get_id(),
+			'order_id' => (string) $order->get_id(),
 			'customer' => [
 				'first_name' => $order->get_billing_first_name(),
 				'last_name' => $order->get_billing_last_name(),
