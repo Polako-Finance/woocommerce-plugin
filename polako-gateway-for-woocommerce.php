@@ -5,12 +5,12 @@
  * Author: Polako Finance
  * Author URI: https://polako-finance.com
  * License: GPL-3.0
- * Version: 0.1.3
+ * Version: 0.1.4
  * Requires Plugins: woocommerce
  * Requires at least: 6.7
- * Tested up to: 6.8
+ * Tested up to: 6.9
  * WC requires at least: 9.9
- * WC tested up to: 10.1
+ * WC tested up to: 10.4
  * Requires PHP: 7.4
  * PHP tested up to: 8.3
  *
@@ -19,7 +19,7 @@
 
 defined('ABSPATH') || exit();
 
-define('WC_GATEWAY_POLAKO_VERSION', '0.1.3');
+define('WC_GATEWAY_POLAKO_VERSION', '0.1.4');
 define('WC_GATEWAY_POLAKO_URL', untrailingslashit(plugins_url('/', __FILE__)));
 define('WC_GATEWAY_POLAKO_PATH', untrailingslashit(plugin_dir_path(__FILE__)));
 
@@ -78,3 +78,31 @@ add_action('before_woocommerce_init', function () {
 		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
 	}
 });
+
+add_action( 'wp_enqueue_scripts', 'woocommerce_polako_enqueue_scripts' );
+
+/**
+ * Add the JS SDK tag
+ *
+ * @noinspection PhpUnused
+ */
+function woocommerce_polako_enqueue_scripts() {
+    if (!is_feed()) {
+        wp_enqueue_script('polako-finance-sdk', 'https://js.polako-finance.com/sdk/sdk.js', array(), null, true);
+        add_filter( 'script_loader_tag', __NAMESPACE__ . '\woocommerce_polako_add_sri', 10, 2 );
+    }
+}
+
+/**
+ * Append the masked API Key to the SDK tag
+ *
+ * @noinspection PhpUnused
+ */
+function woocommerce_polako_add_sri( $html, $handle ) : string {
+    switch( $handle ) {
+        case 'polako-finance-sdk':
+            $html = str_replace( '></script>', ' data-api-keу="signed"></script>', $html );
+            break;
+    }
+    return $html;
+}

@@ -25,6 +25,9 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 	/** @var array Order statuses that can be updated */
 	protected const ACCEPT_STATUSES = [OrderStatus::PENDING, OrderStatus::FAILED, OrderStatus::ON_HOLD];
 
+    /** @var array Currencies supported by this gateway */
+    protected const SUPPORTED_CURRENCIES = ['RSD'];
+
 	public function __construct()
 	{
 		$this->id = 'polako';
@@ -101,6 +104,72 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 		];
 	}
 
+    /** Modify the settings page */
+    public function admin_options()
+    {
+        parent::admin_options();
+
+        $res_pass = "✅";
+        $res_warn = "⚠️";
+        $res_fail = "❌";
+
+        $check_values = [
+            'store_currency' => get_woocommerce_currency(),
+            'price_decimals' => wc_get_price_decimals(),
+            'tax_enabled' => wc_tax_enabled(),
+            'prices_include_tax' => wc_prices_include_tax(),
+            'tax_based_on' => get_option( 'woocommerce_tax_based_on' ),
+            'tax_rates' => sizeof(WC_Tax::get_base_tax_rates()),
+        ];
+        $checks = [
+            'currency' => [
+                0 => __( 'Currency', 'woocommerce' ),
+                1 => $check_values['store_currency'],
+                2 => in_array($check_values['store_currency'], self::SUPPORTED_CURRENCIES, true) ? $res_pass : $res_fail,
+                3 => admin_url( 'admin.php?page=wc-settings&tab=general#woocommerce_currency' ),
+            ],
+            'decimals' => [
+                0 => __( 'Number of decimals', 'woocommerce' ),
+                1 => $check_values['price_decimals'],
+                2 => 2 == $check_values['price_decimals'] ? $res_pass : $res_warn,
+                3 => admin_url( 'admin.php?page=wc-settings&tab=general#woocommerce_price_num_decimals' ),
+            ],
+            'tax_enabled' => [
+                0 => __( 'Enable taxes', 'woocommerce' ),
+                1 => $check_values['tax_enabled'] ? __( 'Yes', 'woocommerce' ) : __( 'No', 'woocommerce' ),
+                2 => $check_values['tax_enabled'] ? $res_pass : $res_warn,
+                3 => admin_url( 'admin.php?page=wc-settings&tab=general#woocommerce_calc_taxes' ),
+            ],
+            'prices_include_tax' => [
+                0 => __( 'Prices entered with tax', 'woocommerce' ),
+                1 => $check_values['prices_include_tax'] ? __( 'Yes', 'woocommerce' ) : __( 'No', 'woocommerce' ),
+                2 => $check_values['prices_include_tax'] ? $res_pass : $res_warn,
+                3 => admin_url( 'admin.php?page=wc-settings&tab=tax#woocommerce_prices_include_tax' ),
+            ],
+            'tax_based_on' => [
+                0 => __( 'Calculate tax based on', 'woocommerce' ),
+                1 => $check_values['tax_based_on'],
+                2 => 'base' == $check_values['tax_based_on'] ? $res_pass : $res_warn,
+                3 => admin_url( 'admin.php?page=wc-settings&tab=tax#woocommerce_tax_based_on' ),
+            ],
+            'tax_rates' => [
+                0 => __( 'Standard rates', 'woocommerce' ),
+                1 => $check_values['tax_rates'],
+                2 => 0 < $check_values['tax_rates'] ? $res_pass : $res_warn,
+                3 => admin_url( 'admin.php?page=wc-settings&tab=tax&section=standard' ),
+            ],
+        ];
+
+        echo "<h3>" . __('Store checks', 'polako-gateway-for-woocommerce') . "</h3>";
+        foreach ($checks as $type => $check) {
+            echo sprintf('<p>%3$s %1$s: <b>%2$s</b>', ...$check);
+            if ($res_pass != $check[2]) {
+                echo ' &emsp;<a href="' . esc_url( $check[3] ) . '">' . esc_html__( 'Manage', 'woocommerce' ) . '</a>';
+            }
+            echo '</p>';
+        }
+    }
+
 	/**
 	 * Get the settings keys that must be filled in
 	 *
@@ -120,7 +189,7 @@ class WC_Gateway_Polako extends WC_Payment_Gateway
 	/** Add a notice to the settings form while in Test Mode */
 	public function add_testmode_admin_settings_notice()
 	{
-		$this->form_fields['testmode']['description'] .= '<br/><strong>' . esc_html__('WARNING: No real payments performed in Test Mode.', 'polako-gateway-for-woocommerce') . '.</strong>';
+		$this->form_fields['testmode']['description'] .= '<br/><strong>' . esc_html__('WARNING: No real payments performed in Test Mode.', 'polako-gateway-for-woocommerce') . '</strong>';
 	}
 
 	/** Supporting method for @see is_available */

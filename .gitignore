@@ -9,3 +9,5 @@
 /vendor
 
 /plugin-svn
+
+/.idea/dataSources.xml

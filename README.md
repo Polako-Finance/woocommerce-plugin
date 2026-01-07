@@ -10,7 +10,7 @@ Give customers more flexibility with Polako Finance – the only Serbian payment
 ## Dependencies
 
 - Requires at least: 6.7
-- Tested up to: 6.8
+- Tested up to: 6.9
 - Requires PHP: 7.4
 
 ## Get started

@@ -2,9 +2,9 @@
 Contributors: polakofinance, ginmitch
 Tags: credit card, polako finance, payment request
 Requires at least: 6.7
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.1.3
+Stable tag: 0.1.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -71,5 +71,9 @@ No, but to open a merchant account, you'll need a Serbian business bank account 
 
 = 0.1.3 - 2025-12-24 =
  * Fixed Order ID type
+
+= 0.1.4 - 2026-01-07 =
+ * Added the JS SDK
+ * Added store checks
 
 [See changelog for all versions](https://raw.githubusercontent.com/polako-finance/polako-gateway-for-woocommerce/trunk/changelog.txt).

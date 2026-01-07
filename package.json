@@ -1,7 +1,7 @@
 {
 	"name": "polako-gateway-for-woocommerce",
 	"title": "Polako Gateway for WooCommerce",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"license": "GPL-3.0",
 	"engines": {
 		"node": ">=20",
